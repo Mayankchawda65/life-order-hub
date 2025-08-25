@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Calendar, DollarSign, AlertCircle } from "lucide-react";
 import BillCard from "./BillCard";
+import { useToast } from "@/hooks/use-toast";
 
 const mockBills = [
   { id: 1, name: "Netflix", amount: 15.99, dueDate: "2024-08-27", category: "Streaming", status: "due" as const },
@@ -13,13 +15,29 @@ const mockBills = [
 ];
 
 const Dashboard = () => {
-  const totalMonthly = mockBills.reduce((sum, bill) => sum + bill.amount, 0);
-  const dueSoon = mockBills.filter(bill => bill.status === "due").length;
-  const paidThisMonth = mockBills.filter(bill => bill.status === "paid").length;
+  const { toast } = useToast();
+  const [bills, setBills] = useState(mockBills);
+  
+  const totalMonthly = bills.reduce((sum, bill) => sum + bill.amount, 0);
+  const dueSoon = bills.filter(bill => bill.status === "due").length;
+  const paidThisMonth = bills.filter(bill => bill.status === "paid").length;
+
+  const handleStatusChange = (billId: number, newStatus: typeof mockBills[0]['status']) => {
+    setBills(prevBills => 
+      prevBills.map(bill => 
+        bill.id === billId ? { ...bill, status: newStatus } : bill
+      )
+    );
+  };
+
+  const handleEdit = (billId: number) => {
+    // Placeholder for edit functionality
+    console.log('Edit bill:', billId);
+  };
 
   return (
-    <section className="py-16 bg-gradient-to-b from-accent/30 to-background">
-      <div className="container mx-auto px-6">
+    <section id="dashboard" className="py-16 bg-gradient-to-b from-accent/30 to-background">
+      <div className="container mx-auto px-6 animate-fade-in">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Your Financial Dashboard</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -29,20 +47,20 @@ const Dashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="p-6 text-center bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 hover:shadow-lg transition-all duration-300">
-            <DollarSign className="w-8 h-8 text-primary mx-auto mb-3" />
+          <Card className="p-6 text-center bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-bounce-in">
+            <DollarSign className="w-8 h-8 text-primary mx-auto mb-3 animate-float" />
             <div className="text-3xl font-bold text-primary mb-1">${totalMonthly.toFixed(2)}</div>
             <div className="text-sm text-muted-foreground">Total Monthly Bills</div>
           </Card>
 
-          <Card className="p-6 text-center bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 hover:shadow-lg transition-all duration-300">
-            <AlertCircle className="w-8 h-8 text-warning mx-auto mb-3" />
+          <Card className="p-6 text-center bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-bounce-in [animation-delay:0.1s]">
+            <AlertCircle className="w-8 h-8 text-warning mx-auto mb-3 animate-float [animation-delay:0.5s]" />
             <div className="text-3xl font-bold text-warning mb-1">{dueSoon}</div>
             <div className="text-sm text-muted-foreground">Bills Due Soon</div>
           </Card>
 
-          <Card className="p-6 text-center bg-gradient-to-br from-success/10 to-success/5 border border-success/20 hover:shadow-lg transition-all duration-300">
-            <Calendar className="w-8 h-8 text-success mx-auto mb-3" />
+          <Card className="p-6 text-center bg-gradient-to-br from-success/10 to-success/5 border border-success/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-bounce-in [animation-delay:0.2s]">
+            <Calendar className="w-8 h-8 text-success mx-auto mb-3 animate-float [animation-delay:1s]" />
             <div className="text-3xl font-bold text-success mb-1">{paidThisMonth}</div>
             <div className="text-sm text-muted-foreground">Paid This Month</div>
           </Card>
@@ -61,8 +79,18 @@ const Dashboard = () => {
             </div>
 
             <div className="space-y-4">
-              {mockBills.map((bill) => (
-                <BillCard key={bill.id} bill={bill} />
+              {bills.map((bill, index) => (
+                <div
+                  key={bill.id}
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <BillCard 
+                    bill={bill} 
+                    onStatusChange={handleStatusChange}
+                    onEdit={handleEdit}
+                  />
+                </div>
               ))}
             </div>
           </div>

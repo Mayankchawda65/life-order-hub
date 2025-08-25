@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Check, AlertTriangle, Clock } from "lucide-react";
+import { Calendar, Check, AlertTriangle, Clock, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface Bill {
   id: number;
@@ -14,9 +15,28 @@ interface Bill {
 
 interface BillCardProps {
   bill: Bill;
+  onStatusChange?: (billId: number, newStatus: Bill['status']) => void;
+  onEdit?: (billId: number) => void;
 }
 
-const BillCard = ({ bill }: BillCardProps) => {
+const BillCard = ({ bill, onStatusChange, onEdit }: BillCardProps) => {
+  const { toast } = useToast();
+
+  const handleMarkAsPaid = () => {
+    onStatusChange?.(bill.id, "paid");
+    toast({
+      title: "Bill Marked as Paid",
+      description: `${bill.name} has been marked as paid successfully.`,
+    });
+  };
+
+  const handleEdit = () => {
+    onEdit?.(bill.id);
+    toast({
+      title: "Edit Bill",
+      description: `Opening edit form for ${bill.name}.`,
+    });
+  };
   const getStatusColor = (status: string) => {
     switch (status) {
       case "paid": return "success";
@@ -56,21 +76,22 @@ const BillCard = ({ bill }: BillCardProps) => {
 
   return (
     <Card className={cn(
-      "p-4 border transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer",
-      statusColor === "success" && "bg-gradient-to-r from-success/5 to-success/10 border-success/20",
-      statusColor === "warning" && "bg-gradient-to-r from-warning/5 to-warning/10 border-warning/20",
-      statusColor === "destructive" && "bg-gradient-to-r from-destructive/5 to-destructive/10 border-destructive/20",
-      statusColor === "primary" && "bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20"
+      "p-4 border transition-all duration-500 hover:shadow-xl hover:scale-[1.02] cursor-pointer animate-fade-in-up hover:shadow-[0_0_30px_rgba(0,0,0,0.1)] hover:-translate-y-1",
+      statusColor === "success" && "bg-gradient-to-r from-success/5 to-success/10 border-success/20 hover:border-success/40",
+      statusColor === "warning" && "bg-gradient-to-r from-warning/5 to-warning/10 border-warning/20 hover:border-warning/40",
+      statusColor === "destructive" && "bg-gradient-to-r from-destructive/5 to-destructive/10 border-destructive/20 hover:border-destructive/40",
+      statusColor === "primary" && "bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 hover:border-primary/40"
     )}>
       <div className="flex items-center justify-between">
         {/* Left Side - Bill Info */}
         <div className="flex items-center gap-4">
           <div className={cn(
-            "w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm",
-            statusColor === "success" && "bg-gradient-to-br from-success to-success/80",
-            statusColor === "warning" && "bg-gradient-to-br from-warning to-warning/80",
-            statusColor === "destructive" && "bg-gradient-to-br from-destructive to-destructive/80",
-            statusColor === "primary" && "bg-gradient-to-br from-primary to-primary/80"
+            "w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm animate-float",
+            "shadow-lg transition-all duration-300 hover:scale-110",
+            statusColor === "success" && "bg-gradient-to-br from-success to-success/80 shadow-success/20",
+            statusColor === "warning" && "bg-gradient-to-br from-warning to-warning/80 shadow-warning/20",
+            statusColor === "destructive" && "bg-gradient-to-br from-destructive to-destructive/80 shadow-destructive/20",
+            statusColor === "primary" && "bg-gradient-to-br from-primary to-primary/80 shadow-primary/20"
           )}>
             {bill.name.charAt(0).toUpperCase()}
           </div>
@@ -106,12 +127,20 @@ const BillCard = ({ bill }: BillCardProps) => {
         {bill.status !== "paid" && (
           <Button 
             size="sm" 
-            className="flex-1 bg-gradient-to-r from-success to-success/80 hover:shadow-md"
+            onClick={handleMarkAsPaid}
+            className="flex-1 bg-gradient-to-r from-success to-success/80 hover:shadow-lg hover:scale-105 transition-all duration-300"
           >
+            <Check className="w-4 h-4 mr-1" />
             Mark as Paid
           </Button>
         )}
-        <Button size="sm" variant="outline" className="flex-1">
+        <Button 
+          size="sm" 
+          variant="outline" 
+          onClick={handleEdit}
+          className="flex-1 hover:bg-primary/10 hover:border-primary hover:scale-105 transition-all duration-300"
+        >
+          <Edit className="w-4 h-4 mr-1" />
           Edit
         </Button>
       </div>
