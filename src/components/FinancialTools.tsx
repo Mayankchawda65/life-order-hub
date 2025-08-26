@@ -1,8 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { TrendingUp, PiggyBank, Target, DollarSign } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { TrendingUp, PiggyBank, Target, DollarSign, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 const savingTips = [
   "Set up automatic transfers to savings accounts",
@@ -24,6 +27,17 @@ const investmentOptions = [
 ];
 
 const FinancialTools = () => {
+  const [goals, setGoals] = useState([
+    { id: 1, name: "Emergency Fund", target: 15000, current: 6750, description: "Save 3-6 months of expenses" },
+    { id: 2, name: "Vacation Fund", target: 5000, current: 1250, description: "Save $5,000 for dream vacation" }
+  ]);
+  
+  const [cashFlow, setCashFlow] = useState({
+    monthlyIncome: 4500,
+    monthlyExpenses: 3200,
+    netSavings: 1300
+  });
+
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case "Low": return "success";
@@ -125,23 +139,50 @@ const FinancialTools = () => {
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="p-4 bg-warning/5 rounded-lg border border-warning/20">
-                  <h4 className="font-semibold mb-2">Emergency Fund</h4>
-                  <p className="text-sm text-muted-foreground mb-2">Save 3-6 months of expenses</p>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="bg-warning h-2 rounded-full" style={{ width: "45%" }}></div>
+                {goals.map((goal) => (
+                  <div key={goal.id} className="p-4 bg-warning/5 rounded-lg border border-warning/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold">{goal.name}</h4>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Goal: {goal.name}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="goalName">Goal Name</Label>
+                              <Input id="goalName" defaultValue={goal.name} />
+                            </div>
+                            <div>
+                              <Label htmlFor="targetAmount">Target Amount</Label>
+                              <Input id="targetAmount" type="number" defaultValue={goal.target} />
+                            </div>
+                            <div>
+                              <Label htmlFor="currentAmount">Current Amount</Label>
+                              <Input id="currentAmount" type="number" defaultValue={goal.current} />
+                            </div>
+                            <Button className="w-full">Update Goal</Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">{goal.description}</p>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div 
+                        className="bg-warning h-2 rounded-full" 
+                        style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {Math.round((goal.current / goal.target) * 100)}% complete (${goal.current.toLocaleString()} / ${goal.target.toLocaleString()})
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">45% complete</p>
-                </div>
-                
-                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <h4 className="font-semibold mb-2">Vacation Fund</h4>
-                  <p className="text-sm text-muted-foreground mb-2">Save $5,000 for dream vacation</p>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div className="bg-primary h-2 rounded-full" style={{ width: "25%" }}></div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">25% complete</p>
-                </div>
+                ))}
               </div>
             </DialogContent>
           </Dialog>
@@ -163,25 +204,53 @@ const FinancialTools = () => {
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-semibold">Cash Flow Analysis</h4>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Cash Flow</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="income">Monthly Income</Label>
+                          <Input id="income" type="number" defaultValue={cashFlow.monthlyIncome} />
+                        </div>
+                        <div>
+                          <Label htmlFor="expenses">Monthly Expenses</Label>
+                          <Input id="expenses" type="number" defaultValue={cashFlow.monthlyExpenses} />
+                        </div>
+                        <Button className="w-full">Update Cash Flow</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 bg-success/5 rounded-lg text-center">
                     <h4 className="font-semibold text-success">Monthly Income</h4>
-                    <p className="text-2xl font-bold">$4,500</p>
+                    <p className="text-2xl font-bold">${cashFlow.monthlyIncome.toLocaleString()}</p>
                   </div>
                   <div className="p-4 bg-destructive/5 rounded-lg text-center">
                     <h4 className="font-semibold text-destructive">Monthly Expenses</h4>
-                    <p className="text-2xl font-bold">$3,200</p>
+                    <p className="text-2xl font-bold">${cashFlow.monthlyExpenses.toLocaleString()}</p>
                   </div>
                   <div className="p-4 bg-primary/5 rounded-lg text-center">
                     <h4 className="font-semibold text-primary">Net Savings</h4>
-                    <p className="text-2xl font-bold">$1,300</p>
+                    <p className="text-2xl font-bold">${cashFlow.netSavings.toLocaleString()}</p>
                   </div>
                 </div>
                 
                 <div className="p-4 bg-card rounded-lg border">
                   <h4 className="font-semibold mb-2">6-Month Projection</h4>
                   <p className="text-sm text-muted-foreground">
-                    Based on current spending patterns, you'll save approximately <span className="font-semibold text-primary">$7,800</span> in the next 6 months.
+                    Based on current spending patterns, you'll save approximately <span className="font-semibold text-primary">${(cashFlow.netSavings * 6).toLocaleString()}</span> in the next 6 months.
                   </p>
                 </div>
               </div>

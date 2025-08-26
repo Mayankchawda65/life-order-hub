@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Check, AlertTriangle, Clock, Edit, StickyNote } from "lucide-react";
+import { Calendar, Check, AlertTriangle, Clock, Edit, StickyNote, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
@@ -22,9 +23,10 @@ interface BillCardProps {
   onStatusChange?: (billId: number, newStatus: Bill['status']) => void;
   onEdit?: (billId: number) => void;
   onNoteChange?: (billId: number, note: string) => void;
+  onDelete?: (billId: number) => void;
 }
 
-const BillCard = ({ bill, onStatusChange, onEdit, onNoteChange }: BillCardProps) => {
+const BillCard = ({ bill, onStatusChange, onEdit, onNoteChange, onDelete }: BillCardProps) => {
   const { toast } = useToast();
   const [noteText, setNoteText] = useState(bill.note);
 
@@ -49,6 +51,15 @@ const BillCard = ({ bill, onStatusChange, onEdit, onNoteChange }: BillCardProps)
     toast({
       title: "Note Saved",
       description: `Note for ${bill.name} has been updated.`,
+    });
+  };
+
+  const handleDelete = () => {
+    onDelete?.(bill.id);
+    toast({
+      title: "Bill Deleted",
+      description: `${bill.name} has been deleted permanently.`,
+      variant: "destructive",
     });
   };
   const getStatusColor = (status: string) => {
@@ -90,12 +101,38 @@ const BillCard = ({ bill, onStatusChange, onEdit, onNoteChange }: BillCardProps)
 
   return (
     <Card className={cn(
-      "p-4 border transition-all duration-500 hover:shadow-xl hover:scale-[1.02] cursor-pointer animate-fade-in-up hover:shadow-[0_0_30px_rgba(0,0,0,0.1)] hover:-translate-y-1",
+      "p-4 border transition-all duration-500 hover:shadow-xl hover:scale-[1.02] cursor-pointer animate-fade-in-up hover:shadow-[0_0_30px_rgba(0,0,0,0.1)] hover:-translate-y-1 relative",
       statusColor === "success" && "bg-gradient-to-r from-success/5 to-success/10 border-success/20 hover:border-success/40",
       statusColor === "warning" && "bg-gradient-to-r from-warning/5 to-warning/10 border-warning/20 hover:border-warning/40",
       statusColor === "destructive" && "bg-gradient-to-r from-destructive/5 to-destructive/10 border-destructive/20 hover:border-destructive/40",
       statusColor === "primary" && "bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20 hover:border-primary/40"
     )}>
+      {/* Delete Button */}
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-destructive/20 hover:text-destructive"
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Bill</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{bill.name}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/80">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="flex items-center justify-between">
         {/* Left Side - Bill Info */}
         <div className="flex items-center gap-4">

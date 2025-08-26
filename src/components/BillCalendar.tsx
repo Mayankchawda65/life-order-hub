@@ -59,11 +59,29 @@ const BillCalendar = ({ bills }: BillCalendarProps) => {
               onSelect={setSelectedDate}
               className="rounded-md border-0 mx-auto"
               modifiers={{
-                billDue: billDates,
+                overdue: bills.filter(b => b.status === 'overdue').map(b => parseISO(b.dueDate)),
+                due: bills.filter(b => b.status === 'due').map(b => parseISO(b.dueDate)),
+                upcoming: bills.filter(b => b.status === 'upcoming').map(b => parseISO(b.dueDate)),
+                paid: bills.filter(b => b.status === 'paid').map(b => parseISO(b.dueDate)),
               }}
               modifiersStyles={{
-                billDue: { 
-                  backgroundColor: "hsl(var(--primary))",
+                overdue: { 
+                  backgroundColor: "hsl(var(--destructive))",
+                  color: "white",
+                  fontWeight: "bold"
+                },
+                due: { 
+                  backgroundColor: "hsl(var(--warning))",
+                  color: "white",
+                  fontWeight: "bold"
+                },
+                upcoming: { 
+                  backgroundColor: "hsl(142 70% 70%)",
+                  color: "white",
+                  fontWeight: "bold"
+                },
+                paid: { 
+                  backgroundColor: "hsl(var(--success))",
                   color: "white",
                   fontWeight: "bold"
                 }

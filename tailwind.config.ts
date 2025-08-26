@@ -118,7 +118,7 @@ export default {
 				},
 				'float': {
 					'0%, 100%': { transform: 'translateY(0px)' },
-					'50%': { transform: 'translateY(-10px)' }
+					'50%': { transform: 'translateY(-3px)' }
 				}
 			},
 			animation: {
@@ -131,7 +131,7 @@ export default {
 				'slide-in-left': 'slide-in-left 0.5s ease-out',
 				'bounce-in': 'bounce-in 0.6s ease-out',
 				'glow': 'glow 2s ease-in-out infinite',
-				'float': 'float 3s ease-in-out infinite',
+				'float': 'float 6s ease-in-out infinite',
 				'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
 			}
 		}
