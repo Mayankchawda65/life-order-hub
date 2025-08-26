@@ -1,8 +1,19 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Dashboard from "@/components/Dashboard";
+import BillCalendar from "@/components/BillCalendar";
+import FinancialTools from "@/components/FinancialTools";
 import { Card } from "@/components/ui/card";
 import { Shield, Clock, Mail, Smartphone, MapPin } from "lucide-react";
+
+const mockBills = [
+  { id: 1, name: "Netflix", amount: 15.99, dueDate: "2024-08-27", category: "Streaming", status: "due" as const, note: "" },
+  { id: 2, name: "Electric Bill", amount: 89.50, dueDate: "2024-08-24", category: "Utilities", status: "paid" as const, note: "Paid via autopay" },
+  { id: 3, name: "Spotify", amount: 9.99, dueDate: "2024-08-30", category: "Streaming", status: "upcoming" as const, note: "" },
+  { id: 4, name: "Phone Bill", amount: 45.00, dueDate: "2024-08-28", category: "Utilities", status: "due" as const, note: "Call to negotiate rate" },
+  { id: 5, name: "Gym Membership", amount: 29.99, dueDate: "2024-09-01", category: "Health", status: "upcoming" as const, note: "" },
+  { id: 6, name: "Car Insurance", amount: 120.00, dueDate: "2024-08-26", category: "Insurance", status: "overdue" as const, note: "Need to pay ASAP!" },
+];
 
 const Index = () => {
   return (
@@ -17,6 +28,14 @@ const Index = () => {
 
       {/* Dashboard Demo */}
       <Dashboard />
+
+      {/* Bill Calendar */}
+      <div id="calendar">
+        <BillCalendar bills={mockBills} />
+      </div>
+
+      {/* Financial Tools */}
+      <FinancialTools />
       
       {/* Features Section */}
       <section id="about" className="py-16 bg-background">

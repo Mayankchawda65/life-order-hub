@@ -1,8 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Check, AlertTriangle, Clock, Edit } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar, Check, AlertTriangle, Clock, Edit, StickyNote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface Bill {
   id: number;
@@ -11,16 +14,19 @@ interface Bill {
   dueDate: string;
   category: string;
   status: "paid" | "due" | "overdue" | "upcoming";
+  note: string;
 }
 
 interface BillCardProps {
   bill: Bill;
   onStatusChange?: (billId: number, newStatus: Bill['status']) => void;
   onEdit?: (billId: number) => void;
+  onNoteChange?: (billId: number, note: string) => void;
 }
 
-const BillCard = ({ bill, onStatusChange, onEdit }: BillCardProps) => {
+const BillCard = ({ bill, onStatusChange, onEdit, onNoteChange }: BillCardProps) => {
   const { toast } = useToast();
+  const [noteText, setNoteText] = useState(bill.note);
 
   const handleMarkAsPaid = () => {
     onStatusChange?.(bill.id, "paid");
@@ -35,6 +41,14 @@ const BillCard = ({ bill, onStatusChange, onEdit }: BillCardProps) => {
     toast({
       title: "Edit Bill",
       description: `Opening edit form for ${bill.name}.`,
+    });
+  };
+
+  const handleSaveNote = () => {
+    onNoteChange?.(bill.id, noteText);
+    toast({
+      title: "Note Saved",
+      description: `Note for ${bill.name} has been updated.`,
     });
   };
   const getStatusColor = (status: string) => {
@@ -103,6 +117,12 @@ const BillCard = ({ bill, onStatusChange, onEdit }: BillCardProps) => {
               <span>•</span>
               <span>{formatDate(bill.dueDate)}</span>
             </div>
+            {bill.note && (
+              <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                <StickyNote className="w-3 h-3" />
+                <span className="truncate max-w-[200px]">{bill.note}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -143,6 +163,35 @@ const BillCard = ({ bill, onStatusChange, onEdit }: BillCardProps) => {
           <Edit className="w-4 h-4 mr-1" />
           Edit
         </Button>
+        
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="hover:bg-warning/10 hover:border-warning hover:scale-105 transition-all duration-300"
+            >
+              <StickyNote className="w-4 h-4 mr-1" />
+              Note
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Note for {bill.name}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder="Add a note about this bill..."
+                className="min-h-[100px]"
+              />
+              <Button onClick={handleSaveNote} className="w-full">
+                Save Note
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </Card>
   );

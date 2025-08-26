@@ -37,6 +37,12 @@ const Navigation = () => {
               Dashboard
             </button>
             <button 
+              onClick={() => scrollToSection('calendar')}
+              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
+            >
+              Calendar
+            </button>
+            <button 
               onClick={() => scrollToSection('about')}
               className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
             >
@@ -88,6 +94,12 @@ const Navigation = () => {
                 className="text-left text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
               >
                 Dashboard
+              </button>
+              <button 
+                onClick={() => scrollToSection('calendar')}
+                className="text-left text-foreground hover:text-primary transition-colors duration-300 font-medium py-2"
+              >
+                Calendar
               </button>
               <button 
                 onClick={() => scrollToSection('about')}

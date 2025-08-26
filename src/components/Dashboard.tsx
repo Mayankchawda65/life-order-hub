@@ -6,12 +6,12 @@ import BillCard from "./BillCard";
 import { useToast } from "@/hooks/use-toast";
 
 const mockBills = [
-  { id: 1, name: "Netflix", amount: 15.99, dueDate: "2024-08-27", category: "Streaming", status: "due" as const },
-  { id: 2, name: "Electric Bill", amount: 89.50, dueDate: "2024-08-24", category: "Utilities", status: "paid" as const },
-  { id: 3, name: "Spotify", amount: 9.99, dueDate: "2024-08-30", category: "Streaming", status: "upcoming" as const },
-  { id: 4, name: "Phone Bill", amount: 45.00, dueDate: "2024-08-28", category: "Utilities", status: "due" as const },
-  { id: 5, name: "Gym Membership", amount: 29.99, dueDate: "2024-09-01", category: "Health", status: "upcoming" as const },
-  { id: 6, name: "Car Insurance", amount: 120.00, dueDate: "2024-08-26", category: "Insurance", status: "overdue" as const },
+  { id: 1, name: "Netflix", amount: 15.99, dueDate: "2024-08-27", category: "Streaming", status: "due" as const, note: "" },
+  { id: 2, name: "Electric Bill", amount: 89.50, dueDate: "2024-08-24", category: "Utilities", status: "paid" as const, note: "Paid via autopay" },
+  { id: 3, name: "Spotify", amount: 9.99, dueDate: "2024-08-30", category: "Streaming", status: "upcoming" as const, note: "" },
+  { id: 4, name: "Phone Bill", amount: 45.00, dueDate: "2024-08-28", category: "Utilities", status: "due" as const, note: "Call to negotiate rate" },
+  { id: 5, name: "Gym Membership", amount: 29.99, dueDate: "2024-09-01", category: "Health", status: "upcoming" as const, note: "" },
+  { id: 6, name: "Car Insurance", amount: 120.00, dueDate: "2024-08-26", category: "Insurance", status: "overdue" as const, note: "Need to pay ASAP!" },
 ];
 
 const Dashboard = () => {
@@ -35,6 +35,20 @@ const Dashboard = () => {
     console.log('Edit bill:', billId);
   };
 
+  const handleNoteChange = (billId: number, note: string) => {
+    setBills(prevBills => 
+      prevBills.map(bill => 
+        bill.id === billId ? { ...bill, note } : bill
+      )
+    );
+  };
+
+  // Sort bills by priority: overdue, due, upcoming, paid
+  const sortedBills = [...bills].sort((a, b) => {
+    const statusPriority = { overdue: 0, due: 1, upcoming: 2, paid: 3 };
+    return statusPriority[a.status] - statusPriority[b.status];
+  });
+
   return (
     <section id="dashboard" className="py-16 bg-gradient-to-b from-accent/30 to-background">
       <div className="container mx-auto px-6 animate-fade-in">
@@ -47,20 +61,20 @@ const Dashboard = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="p-6 text-center bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-bounce-in">
-            <DollarSign className="w-8 h-8 text-primary mx-auto mb-3 animate-float" />
+          <Card className="p-6 text-center bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-fade-in">
+            <DollarSign className="w-8 h-8 text-primary mx-auto mb-3" />
             <div className="text-3xl font-bold text-primary mb-1">${totalMonthly.toFixed(2)}</div>
             <div className="text-sm text-muted-foreground">Total Monthly Bills</div>
           </Card>
 
-          <Card className="p-6 text-center bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-bounce-in [animation-delay:0.1s]">
-            <AlertCircle className="w-8 h-8 text-warning mx-auto mb-3 animate-float [animation-delay:0.5s]" />
+          <Card className="p-6 text-center bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-fade-in [animation-delay:0.1s]">
+            <AlertCircle className="w-8 h-8 text-warning mx-auto mb-3" />
             <div className="text-3xl font-bold text-warning mb-1">{dueSoon}</div>
             <div className="text-sm text-muted-foreground">Bills Due Soon</div>
           </Card>
 
-          <Card className="p-6 text-center bg-gradient-to-br from-success/10 to-success/5 border border-success/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-bounce-in [animation-delay:0.2s]">
-            <Calendar className="w-8 h-8 text-success mx-auto mb-3 animate-float [animation-delay:1s]" />
+          <Card className="p-6 text-center bg-gradient-to-br from-success/10 to-success/5 border border-success/20 hover:shadow-xl hover:scale-105 transition-all duration-500 animate-fade-in [animation-delay:0.2s]">
+            <Calendar className="w-8 h-8 text-success mx-auto mb-3" />
             <div className="text-3xl font-bold text-success mb-1">{paidThisMonth}</div>
             <div className="text-sm text-muted-foreground">Paid This Month</div>
           </Card>
@@ -79,7 +93,7 @@ const Dashboard = () => {
             </div>
 
             <div className="space-y-4">
-              {bills.map((bill, index) => (
+              {sortedBills.map((bill, index) => (
                 <div
                   key={bill.id}
                   className="animate-fade-in-up"
@@ -89,6 +103,7 @@ const Dashboard = () => {
                     bill={bill} 
                     onStatusChange={handleStatusChange}
                     onEdit={handleEdit}
+                    onNoteChange={handleNoteChange}
                   />
                 </div>
               ))}
